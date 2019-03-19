@@ -2,6 +2,7 @@ import math
 import random
 import copy
 import itertools
+import time
 
 
 
@@ -214,11 +215,15 @@ expensivePath = []
 sums = 0
 sqsums = 0
 
+start = time.time()
+
 for i in paths:
 
     path = list(i)
 
     path = [0] + path
+
+    print(tripDistance(path))
 
     sums += tripDistance(path)
 
@@ -235,6 +240,10 @@ for i in paths:
         expensiveTrip = tripDistance(path)
 
         expensivePath = copy.deepcopy(path)
+
+end = time.time()
+
+print("time elapsed", (end-start))
 
 
 print("cheapest trip", cheapestTrip)
