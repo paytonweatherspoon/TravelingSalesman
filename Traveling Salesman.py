@@ -202,62 +202,92 @@ def crossover(parent1, parent2):
     return offspring
 
 
+# creating table with the distance between each city to every other city
+
+table = []
+
+for i in range(len(map)):
+    row = []
+    for j in range(len(map)):
+        row.append(calcDistance(map[i],map[j]))
+
+    table.append(row)
+
+print(table)
+
+lowestCost = 5.0
+highestCost = 5.0
+randsum = 0
+randsqsums = 0
+#
+min = calcDistance(map[11],map[13])
+min = (min * 14)
+max = 14 * math.sqrt(2)
+
+
+dx = (max-min)/100
+
+
 #exhaustive search
 
-rest = order[1:]
-
-paths = itertools.permutations(rest,13)
-
-cheapestTrip = 5
-cheapestPath = []
-expensiveTrip = 5
-expensivePath = []
-sums = 0
-sqsums = 0
-
-start = time.time()
-
-for i in paths:
-
-    path = list(i)
-
-    path = [0] + path
-
-    print(tripDistance(path))
-
-    sums += tripDistance(path)
-
-    sqsums += tripDistance(path)**2
-
-    if tripDistance(path) < cheapestTrip:
-
-        cheapestTrip = tripDistance(path)
-
-        cheapestPath = copy.deepcopy(path)
-
-    if tripDistance(path) > expensiveTrip:
-
-        expensiveTrip = tripDistance(path)
-
-        expensivePath = copy.deepcopy(path)
-
-end = time.time()
-
-print("time elapsed", (end-start))
-
-
-print("cheapest trip", cheapestTrip)
-print("cheapest path", cheapestPath)
-
-print("Expensive trip", expensiveTrip)
-print("Expensive path", expensivePath)
-
-Stddev = math.sqrt((sqsums - (sums ** 2 / len(order))) / len(order))
-exhaustiveMean = sums / len(order)
-print("stdDev", Stddev)
-print("mean", exhaustiveMean)
-
-
+# exhaustiveHist = [0] * 100
+#
+# rest = order[1:]
+#
+# paths = itertools.permutations(rest,13)
+#
+# cheapestTrip = 5
+# cheapestPath = []
+# expensiveTrip = 5
+# expensivePath = []
+# sums = 0
+# sqsums = 0
+#
+# start = time.time()
+#
+# for i in paths:
+#
+#     path = list(i)
+#
+#     path = [0] + path
+#
+#     distance = 0
+#
+#     for j in range(len(path)-1):
+#
+#         distance += (table[path[j]][path[j+1]])
+#
+#     exhaustiveHist[int((distance-min)/dx)] += 1
+#
+#     if distance < cheapestTrip:
+#
+#         cheapestTrip = distance
+#
+#         cheapestPath = copy.deepcopy(path)
+#
+#     if distance > expensiveTrip:
+#
+#         expensiveTrip = distance
+#
+#         expensivePath = copy.deepcopy(path)
+#
+# end = time.time()
+#
+# print("time elapsed", (end-start))
+#
+#
+# print("cheapest trip", cheapestTrip)
+# print("cheapest path", cheapestPath)
+#
+# print("Expensive trip", expensiveTrip)
+# print("Expensive path", expensivePath)
+#
+# Stddev = math.sqrt((sqsums - (sums ** 2 / len(order))) / len(order))
+# exhaustiveMean = sums / len(order)
+# print("stdDev", Stddev)
+# print("mean", exhaustiveMean)
+#
+# print(exhaustiveHist)
 
 # originalPool = createGenePool(100)
 #
@@ -324,18 +354,18 @@ print("mean", exhaustiveMean)
 
 #Random Trip Search
 
-# lowestCost = 5.0
-# highestCost = 5.0
-# randsum = 0
-# randsqsums = 0
-# #
-# min = calcDistance(map[11],map[13])
-# min = (min * 14)
-# max = 14 * math.sqrt(2)
+lowestCost = 5.0
+highestCost = 5.0
+randsum = 0
+randsqsums = 0
 #
-#
-# dx = (max-min)/100
-#
+min = calcDistance(map[11],map[13])
+min = (min * 14)
+max = 14 * math.sqrt(2)
+
+
+dx = (max-min)/100
+
 # counter = 0
 #
 #
@@ -433,15 +463,11 @@ def simAnneal(order):
 # this is the random change to the order
 
     time = 1
-    temperature = 1000
+    temperature = 100000
 
-    while temperature > .1:
+    while temperature > .0001:
 
         orgOrder = copy.deepcopy(order)
-
-
-        print("old", order, "\t",tripDistance(order))
-
 
         val1 = random.randint(0,len(order)-1)
         val2 = random.randint(0,len(order)-1)
@@ -451,7 +477,7 @@ def simAnneal(order):
         order[val1] = order[val2]
         order[val2] = originial1
 
-        print("new", order,"\t",tripDistance(order))
+        # print("new", order,"\t",tripDistance(order))
 
 
         if tripDistance(order) < tripDistance(orgOrder):
@@ -463,16 +489,18 @@ def simAnneal(order):
 
             deltaF = tripDistance(order) - tripDistance(orgOrder)
 
-            boltzman = 1.38064852 * 10**-23
+            boltzman = 1*10**-15
 
-            keepProb = (1 / (boltzman*temperature)) * math.exp((-deltaF / (boltzman * temperature)))
+            keepProb = int((1 / (boltzman*temperature)) * math.exp((-deltaF / (boltzman * temperature))))
 
             print(deltaF)
-            print(1 / (boltzman * temperature) * math.exp((-deltaF)/(boltzman * temperature)))
-            print(math.exp(-deltaF/(boltzman * temperature)))
+            print("keep Probability", keepProb)
 
 
 
+            # z = random.rand(0,(1/boltzman*temperature))
+            #
+            # print("z", z)
 
             order = copy.deepcopy(orgOrder)
 
@@ -480,16 +508,15 @@ def simAnneal(order):
 
         temperature = temperature / (1 + math.log(1 + time))
 
+        print("temperature", temperature)
 
-
-
-    print("final order ", order)
-    print(time)
-
-
+    # print("final order ", order)
+    # print(time)
+    #
+    # print(temperature)
 
 
     return True
 
-
+simAnneal(order)
 
